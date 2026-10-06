@@ -29,7 +29,7 @@ int main() {
   assert(scanf("%d %lf", &w, &h) == 2);
 
   h /= 100;           // convert cm to m
-  assert(h > 0);      // avoid division by zero
+  assert(h);          // avoid division by zero
   double bmi = w / (h * h);
 
   evaluateBMI(bmi);

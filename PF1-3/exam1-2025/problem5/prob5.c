@@ -9,66 +9,48 @@
 #include <assert.h>
 
 //===================================================================
-// Reads the initial input digits array and returns the number of 
-// digits read. We assume at most 965 digits are read.
-int readInput(int *runs) {
-  int ch, i = 0;
-  while ((ch = getchar()) != ' ' && ch != EOF) 
-    runs[i++] = ch - '0';
-  return i;
-}
+// Replaces runs with its next run-length encoding.
+// Returns the new number of digits.
+int computeRuns(int *runs, int len) {
+  int next[965], j = 0;
+    
+  for (int i = 0; i < len; ) {
+    int digit = runs[i], count = 0;
 
-//===================================================================
-// Stores the decimal representation of n in the array runs at 
-// position idx
-void storeCount(int n, int *runs, int *idx) {
-  int rev[10], j = 0;
-  do {
-    rev[j++] = n % 10;
-    n /= 10;
-  } while (n > 0);
-
-    // append in reverse order
-  for (int i = j - 1; i >= 0; --i) 
-    runs[(*idx)++] = rev[i];
-}
-
-//===================================================================
-// Computes the next run-length encoding of the input array
-void computeRuns(int *runs, int *len) {
-  int count = 1, j = 0, newruns[965];
-
-  for (int i = 1; i < *len; ++i) {
-    if (runs[i] == runs[i - 1]) 
-      count++;
-    else {
-      storeCount(count, newruns, &j);
-      newruns[j++] = runs[i - 1];
-      count = 1;
-    }
+      // Count and consume one complete run of identical digits
+    do {
+      ++count;
+      ++i;
+    } while (i < len && runs[i] == digit);
+      
+      // Append the count followed by the digit
+    next[j++] = count;
+    next[j++] = digit;
   }
-    // flush the last run
-  storeCount(count, newruns, &j);
-  newruns[j++] = runs[*len - 1];
-  
-    // copy back to runs
-  for (int i = 0; i < j; ++i) 
-    runs[i] = newruns[i];
+    
+    // Copy the completed encoding back into the input array
+  for (int i = 0; i < j; ++i)
+    runs[i] = next[i];
 
-  *len = j;
-}  
+  return j;
+}
 
 
 //===================================================================
 
 int main() {
-  int s, runs[965];
-  int len = readInput(runs);
-  assert(scanf(" %d", &s) == 1);
+  int n, s, runs[965];
+  assert(scanf("%d %d", &n, &s) == 2);
+    
+    // initialize the input array with the digits of n
+  int len = 0;
+  if (n >= 10)
+    runs[len++] = n / 10;
+  runs[len++] = n % 10;
 
     // compute s successive run-length encodings
   for (int i = 0; i < s; ++i)  
-    computeRuns(runs, &len);
+    len = computeRuns(runs, len);
   
     // print the resulting array
   for (int i = 0; i < len; ++i)
