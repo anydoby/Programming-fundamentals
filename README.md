@@ -115,17 +115,13 @@ You can also add options after the program name:
 
 $\Large{\color{rosybrown}\text{2. Execution from PATH}}$
 
-Alternatively, you can add the script to your PATH variable and run it from anywhere. To display the current $PATH, run the following command:
+Alternatively, you can add the repository's root folder to your PATH and run the scripts from anywhere. Nothing is copied, so after a `git pull` you automatically use the latest version. Run this once from the repository's root folder:
 
 ```shell
-echo $PATH
+echo "export PATH=\"$PWD:\$PATH\"" >> ~/.bashrc
 ```
 
-Then, copy the script to one of the folders in $PATH. If you have copied the script to the folder before, the command will simply overwrite the previous version. For example:
-
-```shell
-sudo cp ctest.sh /usr/bin/
-```
+Use `~/.zshrc` instead if your shell is zsh (the macOS default), or `~/.bash_profile` for bash on macOS, which does not read `~/.bashrc` in new terminal windows. Then open a new terminal.
 
 Now you can run the script from the directory containing your program and the folder with test cases by using the following command:
 
@@ -138,6 +134,18 @@ You may also choose to redirect the output to a file, in which case the script a
 ```shell
 ctest.sh myprogram.c > results.txt
 ```
+
+<br/>
+
+$\Large{\color{rosybrown}\text{macOS (and other systems)}}$
+
+`ctest.sh` relies on GNU tools and bash 4+ (`readarray`, `sort -V`, `diff -Z`). On macOS the BSD `diff` rejects `-Z`, which makes every test report PASS. Use the Python port [ctest.py](ctest.py) instead: it has the same options and output and needs only Python 3.8+ and a C compiler (Valgrind is optional and Linux-only).
+
+```shell
+../../../ctest.py myprogram.c -d
+```
+
+It also stops a test after 10 seconds (`--timeout SECONDS` or `-t SECONDS`, `0` to disable), and it rebuilds `libclib.a` if the one found was built for a different operating system.
 
 <br/>
 
